@@ -5,6 +5,7 @@ import (
 	"mygogin/config"
 	"mygogin/model"
 	"mygogin/myrouter"
+	"mygogin/service"
 )
 
 // todo 导入gogin
@@ -21,6 +22,12 @@ func main() {
 
 	config.Logger.Info("数据库迁移成功")
 
+	// 初始化RabbitMQ连接
+	config.NewRabbitMQ()
+	defer config.MyRabbitMQ.Close()
+	go service.ConsumeService("mygogin")
+
+	// 初始化路由
 	r := myrouter.Initrouter()
 	r.Static("/static", "./static")
 	err1 := r.Run("127.0.0.1:8080")

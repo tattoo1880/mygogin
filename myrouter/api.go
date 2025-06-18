@@ -5,6 +5,7 @@ import (
 	"mygogin/config"
 	"mygogin/controller"
 	"mygogin/model"
+	"mygogin/myutils"
 	"mygogin/service"
 )
 
@@ -17,6 +18,10 @@ func Initrouter() *gin.Engine {
 	eventRepo := model.NewEventRepo(config.MySqlDB)
 	eventService := service.NewEventService(eventRepo)
 	eventController := controller.NewEventController(eventService)
+
+	myutilsimpl := myutils.NewGetListUtils()
+	myutilservice := service.NewXListService(myutilsimpl)
+	xlistController := controller.NewXListController(myutilservice)
 
 	r := gin.Default()
 
@@ -38,6 +43,17 @@ func Initrouter() *gin.Engine {
 		events.GET("", eventController.GetAllEvents)
 		events.PUT("/:id", eventController.UpdateEvent)
 		events.DELETE("/:id", eventController.DeleteEvent)
+	}
+	// RabbitMQ相关的路由
+	rabbitmq := api.Group("/rabbitmq")
+	{
+		rabbitmq.POST("", service.ReciveRabbitMQ)
+	}
+	// Utils相关的路由
+	myutilsroute := api.Group("/utils")
+	{
+		myutilsroute.GET("/:id", xlistController.GetList)
+
 	}
 
 	return r
