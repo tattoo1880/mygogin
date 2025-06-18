@@ -12,11 +12,13 @@ import (
 func main() {
 	config.Initlog()
 	config.Initdatabase()
-	err := config.MySqlDB.AutoMigrate(&model.User{})
+	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{})
+
 	if err != nil {
 		config.Logger.Fatal("迁移数据库失败", zap.Error(err))
 		panic("数据库迁移失败")
 	}
+
 	config.Logger.Info("数据库迁移成功")
 
 	r := myrouter.Initrouter()
