@@ -23,6 +23,10 @@ func Initrouter() *gin.Engine {
 	myutilservice := service.NewXListService(myutilsimpl)
 	xlistController := controller.NewXListController(myutilservice)
 
+	myutilsximpl := myutils.NewXVideoDownload()
+	myxvideoservice := service.NewXVideoService(myutilsximpl)
+	xvideoController := controller.NewXVideoController(myxvideoservice)
+
 	r := gin.Default()
 
 	api := r.Group("/api")
@@ -53,6 +57,7 @@ func Initrouter() *gin.Engine {
 	myutilsroute := api.Group("/utils")
 	{
 		myutilsroute.GET("/:id", xlistController.GetList)
+		myutilsroute.POST("/xvideo", xvideoController.GetXVideoUrl)
 
 	}
 
