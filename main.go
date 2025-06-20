@@ -27,7 +27,8 @@ func main() {
 	// 初始化RabbitMQ连接
 	config.NewRabbitMQ()
 	defer config.MyRabbitMQ.Close()
-	go service.ConsumeService("mygogin")
+	go service.ConsumeService("2")
+	go service.ConsumeService("1")
 
 	// 初始化路由
 	r := myrouter.Initrouter()

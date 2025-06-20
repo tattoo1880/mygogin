@@ -1,6 +1,7 @@
 package myrouter
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"mygogin/config"
 	"mygogin/controller"
@@ -28,6 +29,8 @@ func Initrouter() *gin.Engine {
 	xvideoController := controller.NewXVideoController(myxvideoservice)
 
 	r := gin.Default()
+	// CORS配置
+	r.Use(cors.Default())
 
 	api := r.Group("/api")
 	users := api.Group("/users")
@@ -52,6 +55,7 @@ func Initrouter() *gin.Engine {
 	rabbitmq := api.Group("/rabbitmq")
 	{
 		rabbitmq.POST("", service.ReciveRabbitMQ)
+		rabbitmq.GET("/ws", service.WebSocketHandler) // WebSocket连接
 	}
 	// Utils相关的路由
 	myutilsroute := api.Group("/utils")
