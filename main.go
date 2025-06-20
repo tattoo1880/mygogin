@@ -32,7 +32,6 @@ func main() {
 
 	// 初始化路由
 	r := myrouter.Initrouter()
-	r.Static("/static", "./static")
 	err1 := r.Run("127.0.0.1:8080")
 	if err1 != nil {
 
