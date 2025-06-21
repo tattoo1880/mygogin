@@ -35,6 +35,11 @@ func ConsumeService(UserId string) {
 			Logger.Error("发送消息失败", zap.Error(err))
 			continue
 		}
+		// ! 手动确认消息
+		if err := d.Ack(false); err != nil {
+			Logger.Error("消息确认失败", zap.Error(err))
+			continue
+		}
 		Logger.Info("发送消息成功", zap.String("to_user_id", UserId), zap.String("msg", msg.Msg))
 
 		Logger.Info("消息确认成功", zap.String("message", string(d.Body)))

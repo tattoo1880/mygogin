@@ -69,8 +69,10 @@ func (r *RabbitMQ) Publish(routingKey string, body MsgBody) error {
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        msg_body, // 消息体
+			// 消息持久化
+			DeliveryMode: amqp.Persistent, // 消息持久化
+			ContentType:  "text/plain",
+			Body:         msg_body, // 消息体
 		},
 	)
 }
@@ -105,11 +107,13 @@ func (r *RabbitMQ) Consume(userId string) (<-chan amqp.Delivery, error) {
 	return r.channel.Consume(
 		q.Name, // 队列名称
 		"",     // consumer tag
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // arguments
+		// ! auto-ack 改成 false  // 是否自动确认消息
+		// true,   // auto-ack
+		false, // auto-ack
+		false, // exclusive
+		false, // no-local
+		false, // no-wait
+		nil,   // arguments
 	)
 }
 
