@@ -6,7 +6,6 @@ import (
 	"mygogin/config"
 	"mygogin/model"
 	"mygogin/myrouter"
-	"mygogin/service"
 )
 
 // todo 导入gogin
@@ -27,8 +26,8 @@ func main() {
 	// 初始化RabbitMQ连接
 	config.NewRabbitMQ()
 	defer config.MyRabbitMQ.Close()
-	go service.ConsumeService("2")
-	go service.ConsumeService("1")
+	// go service.ConsumeService("2")
+	// go service.ConsumeService("1")
 
 	// 初始化路由
 	r := myrouter.Initrouter()
