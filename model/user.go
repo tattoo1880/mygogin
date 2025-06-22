@@ -4,12 +4,12 @@ import "gorm.io/gorm"
 
 type User struct {
 	ID       int64  `json:"id" gorm:"primary_key"`
-	Name     string `json:"name"`
+	Name     string `json:"name" gorm:"not null;unique"`
 	Password string `json:"password"`
 }
 
 type UserRepository interface {
-	//! CRUD
+	// ! CRUD
 	CreateUser(user *User) error
 	GetUserByID(id int64) (*User, error)
 	FindAllUsers() ([]*User, error)

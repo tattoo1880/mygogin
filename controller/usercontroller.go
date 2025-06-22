@@ -5,6 +5,7 @@ import (
 	"mygogin/service"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,10 +25,21 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 	if err := c.service.CreateUser(&user); err != nil {
+
+		// 如果存在重复的用户名则返回错误
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			// config.Logger.Warn("用户名已存在", zap.String("username", user.Name))
+			ctx.JSON(http.StatusOK, gin.H{"error": err.Error(), "message": "用户名已存在"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "用户创建成功",
+		"user":    user,
+	})
 }
 
 func (c *UserController) GetUserByID(ctx *gin.Context) {
