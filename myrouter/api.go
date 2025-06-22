@@ -15,6 +15,7 @@ func Initrouter() *gin.Engine {
 	userepo := model.NewUserRepo(config.MySqlDB)
 	userService := service.NewUserService(userepo)
 	userController := controller.NewUserController(userService)
+	loginController := controller.NewLoginController(userService)
 
 	eventRepo := model.NewEventRepo(config.MySqlDB)
 	eventService := service.NewEventService(eventRepo)
@@ -45,6 +46,7 @@ func Initrouter() *gin.Engine {
 		users.GET("", userController.GetAllUsers)
 		users.PUT("/:id", userController.UpdateUser)
 		users.DELETE("/:id", userController.DeleteUser)
+		users.POST("/login", loginController.Login) // 登录路由
 	}
 	// 事件相关的路由
 	events := api.Group("/events")

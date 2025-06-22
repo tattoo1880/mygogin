@@ -6,12 +6,13 @@ import (
 )
 
 type UserService interface {
-	//! CRUD
+	// ! CRUD
 	CreateUser(user *model.User) error
 	GetUserByID(id int64) (*model.User, error)
 	GetAllUsers() ([]*model.User, error)
 	UpdateUser(user *model.User) error
 	DeleteUser(id int64) error
+	Login(user *model.User) (*model.User, error)
 }
 
 type userService struct {
@@ -44,4 +45,19 @@ func (s *userService) UpdateUser(user *model.User) error {
 
 func (s *userService) DeleteUser(id int64) error {
 	return s.repo.DeleteUser(id)
+}
+
+func (s *userService) Login(user *model.User) (*model.User, error) {
+	// 可以做业务校验
+	if user.Name == "" || user.Password == "" {
+		return nil, errors.New("用户名或密码不能为空")
+	}
+	existingUser, err := s.repo.GetUserByName(user.Name)
+	if err != nil {
+		return nil, err
+	}
+	if existingUser == nil || existingUser.Password != user.Password {
+		return nil, errors.New("用户名或密码错误")
+	}
+	return existingUser, nil
 }

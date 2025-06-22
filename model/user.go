@@ -15,6 +15,7 @@ type UserRepository interface {
 	FindAllUsers() ([]*User, error)
 	UpdateUser(user *User) error
 	DeleteUser(id int64) error
+	GetUserByName(name string) (*User, error)
 }
 
 type UserRepo struct {
@@ -32,6 +33,14 @@ func (r *UserRepo) CreateUser(user *User) error {
 func (r *UserRepo) GetUserByID(id int64) (*User, error) {
 	var user User
 	if err := r.db.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *UserRepo) GetUserByName(name string) (*User, error) {
+	var user User
+	if err := r.db.Where("name = ?", name).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
