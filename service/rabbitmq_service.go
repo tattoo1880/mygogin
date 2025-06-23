@@ -52,20 +52,20 @@ func ConsumeService(UserId string) {
 func ReciveRabbitMQ(ctx *gin.Context) {
 	type request struct {
 		ToUserId string  `json:"to_user_id"`
-		Msg      MsgBody `json:"msg"`
+		Content  MsgBody `json:"msg"`
 	}
 
 	var req request
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		Logger.Error("参数错误")
+		Logger.Error("参数错误", zap.Error(err))
 		ctx.JSON(200, gin.H{
 			"code": 400,
 			"msg":  "参数错误",
 		})
 		return
 	}
-	Logger.Info("接收到消息", zap.String("给用户", req.ToUserId), zap.String("来自用户", req.Msg.FromUserid), zap.String("msg", req.Msg.Msg))
-	if err := MyRabbitMQ.Publish(req.ToUserId, req.Msg); err != nil {
+	Logger.Info("接收到消息", zap.String("给用户", req.ToUserId), zap.String("来自用户", req.Content.FromUserid), zap.String("msg", req.Content.Msg))
+	if err := MyRabbitMQ.Publish(req.ToUserId, req.Content); err != nil {
 		Logger.Error("发送消息失败")
 		ctx.JSON(200, gin.H{
 			"code": 400,
