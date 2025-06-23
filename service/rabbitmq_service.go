@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	. "mygogin/config"
+	"mygogin/model"
 )
 
 func ConsumeService(UserId string) {
@@ -41,6 +42,22 @@ func ConsumeService(UserId string) {
 			continue
 		}
 		Logger.Info("发送消息成功", zap.String("to_user_id", UserId), zap.String("msg", msg.Msg))
+
+		// TODO: 直接实例化 ChatMsgRepo 和 ChatMsgService
+		chatmsgrepo := model.NewChatMsgRepo(MySqlDB)
+		chatmsgservice := NewChatMsgService(chatmsgrepo)
+
+		chatmsg := &model.ChatMsg{
+			FromUserID: msg.FromUserid,
+			ToUserID:   UserId,
+			Msg:        msg.Msg,
+		}
+
+		if err := chatmsgservice.CreateChatMsg(chatmsg); err != nil {
+			Logger.Error("保存消息到数据库失败", zap.Error(err))
+			continue
+		}
+		Logger.Info("保存消息到数据库成功", zap.String("id", chatmsg.ID), zap.String("from_userid", chatmsg.FromUserID), zap.String("to_userid", chatmsg.ToUserID), zap.String("msg", chatmsg.Msg))
 
 		Logger.Info("消息确认成功", zap.String("message", string(d.Body)))
 		Logger.Info("消息处理完成", zap.String("to_user_id", UserId), zap.String("msg", msg.Msg))

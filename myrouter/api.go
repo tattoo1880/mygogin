@@ -29,6 +29,10 @@ func Initrouter() *gin.Engine {
 	myxvideoservice := service.NewXVideoService(myutilsximpl)
 	xvideoController := controller.NewXVideoController(myxvideoservice)
 
+	chatmsgrepo := model.NewChatMsgRepo(config.MySqlDB)
+	chatmsgservice := service.NewChatMsgService(chatmsgrepo)
+	chatmsgcontroller := controller.NewChatMsgController(chatmsgservice)
+
 	r := gin.Default()
 	// CORS配置
 	r.Use(cors.Default())
@@ -69,6 +73,14 @@ func Initrouter() *gin.Engine {
 		myutilsroute.GET("/:id", xlistController.GetList)
 		myutilsroute.POST("/xvideo", xvideoController.GetXVideoUrl)
 
+	}
+	chatmsg := api.Group("/chatmsg")
+	{
+		chatmsg.GET("/from/:fromUserId", chatmsgcontroller.GetChatMsgsByFromUserId)
+		chatmsg.GET("/to/:toUserId", chatmsgcontroller.GetChatMsgsByToUserId)
+		chatmsg.POST("", chatmsgcontroller.CreateChatMsg)
+		chatmsg.GET("", chatmsgcontroller.GetAllChatMsgs)
+		chatmsg.DELETE("/:id", chatmsgcontroller.DeleteChatMsg)
 	}
 
 	return r
