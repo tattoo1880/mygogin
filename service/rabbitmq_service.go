@@ -8,7 +8,20 @@ import (
 	"mygogin/model"
 )
 
-func ConsumeService(UserId string) {
+type ConsumeServiceInterface interface {
+	ConsumeService(UserId string)
+	ReciveRabbitMQ(ctx *gin.Context)
+}
+
+type ConsumeSerice struct {
+	service ChatMsgServiceInterface
+}
+
+func NewConsumeService(service ChatMsgServiceInterface) ConsumeServiceInterface {
+	return &ConsumeSerice{service: service}
+}
+
+func (c *ConsumeSerice) ConsumeService(UserId string) {
 	// TODO
 
 	message, err := MyRabbitMQ.Consume(UserId)
@@ -56,8 +69,6 @@ func ConsumeService(UserId string) {
 		Logger.Info("发送消息成功", zap.String("to_user_id", UserId), zap.String("msg", msg.Msg))
 
 		// TODO: 直接实例化 ChatMsgRepo 和 ChatMsgService
-		chatmsgrepo := model.NewChatMsgRepo(MySqlDB)
-		chatmsgservice := NewChatMsgService(chatmsgrepo)
 
 		chatmsg := &model.ChatMsg{
 			FromUserID: msg.FromUserid,
@@ -65,7 +76,7 @@ func ConsumeService(UserId string) {
 			Msg:        msg.Msg,
 		}
 
-		if err := chatmsgservice.CreateChatMsg(chatmsg); err != nil {
+		if err := c.service.CreateChatMsg(chatmsg); err != nil {
 			Logger.Error("保存消息到数据库失败", zap.Error(err))
 			continue
 		}
@@ -78,7 +89,7 @@ func ConsumeService(UserId string) {
 	}
 }
 
-func ReciveRabbitMQ(ctx *gin.Context) {
+func (c *ConsumeSerice) ReciveRabbitMQ(ctx *gin.Context) {
 	type request struct {
 		ToUserId string  `json:"to_user_id"`
 		Content  MsgBody `json:"msg"`

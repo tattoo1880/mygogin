@@ -33,6 +33,9 @@ func Initrouter() *gin.Engine {
 	chatmsgservice := service.NewChatMsgService(chatmsgrepo)
 	chatmsgcontroller := controller.NewChatMsgController(chatmsgservice)
 
+	rabbitservice := service.NewConsumeService(chatmsgservice)
+	websocketservice := service.NewWebSocketService(rabbitservice)
+
 	r := gin.Default()
 	// CORS配置
 	r.Use(cors.Default())
@@ -64,8 +67,8 @@ func Initrouter() *gin.Engine {
 	// RabbitMQ相关的路由
 	rabbitmq := api.Group("/rabbitmq")
 	{
-		rabbitmq.POST("", service.ReciveRabbitMQ)
-		rabbitmq.GET("/ws", service.WebSocketHandler) // WebSocket连接
+		rabbitmq.POST("", rabbitservice.ReciveRabbitMQ)
+		rabbitmq.GET("/ws", websocketservice.WebSocketHandler) // WebSocket连接
 	}
 	// Utils相关的路由
 	myutilsroute := api.Group("/utils")
