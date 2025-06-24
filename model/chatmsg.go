@@ -7,7 +7,7 @@ import (
 )
 
 type ChatMsg struct {
-	ID         string    `gorm:"type:char(36);primaryKey;default:uuid()" json:"id"`
+	ID         string    `gorm:"type:char(36);primaryKey;" json:"id"`
 	FromUserID string    `gorm:"type:varchar(100);not null" json:"from_userid"`
 	ToUserID   string    `gorm:"type:varchar(100);not null" json:"to_userid"`
 	Msg        string    `gorm:"type:text;not null" json:"msg"`

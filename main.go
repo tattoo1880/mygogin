@@ -14,7 +14,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	config.Initlog()
 	config.Initdatabase()
-	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{})
+	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{}, &model.ChatMsg{})
 
 	if err != nil {
 		config.Logger.Fatal("迁移数据库失败", zap.Error(err))
