@@ -46,6 +46,7 @@ func WebSocketHandler(ctx *gin.Context) {
 		if err != nil {
 			//Logger.Info("WebSocket 断开", zap.String("user_id", userId))
 			config.Logger.Error("WebSocket 断开", zap.Error(err))
+			//config.Logger.Warn("websocket 连接断开", zap.String("user_id", userId))
 			break
 		}
 	}
