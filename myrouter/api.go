@@ -31,7 +31,7 @@ func Initrouter() *gin.Engine {
 
 	chatmsgrepo := model.NewChatMsgRepo(config.MySqlDB)
 	chatmsgservice := service.NewChatMsgService(chatmsgrepo)
-	chatmsgcontroller := controller.NewChatMsgController(chatmsgservice)
+	chatmsgcontroller := controller.NewChatMsgController(chatmsgservice, userService)
 
 	rabbitservice := service.NewConsumeService(chatmsgservice)
 	websocketservice := service.NewWebSocketService(rabbitservice)
