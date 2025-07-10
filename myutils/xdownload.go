@@ -6,6 +6,7 @@ import (
 	"github.com/imroc/req/v3"
 	"log"
 	"net/http"
+	"os"
 )
 
 type GetListUtils interface {
@@ -84,7 +85,7 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 		handlerError(err)
 	}
 
-	// fmt.Println("请求成功，数据为：", resp.String())
+	fmt.Println("请求成功，数据为：", resp.String())
 
 	var result = map[string]interface{}{}
 	err = resp.Unmarshal(&result)
@@ -92,11 +93,22 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 		handlerError(err)
 	}
 
-	list := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["legacy"].(map[string]interface{})["entities"].(map[string]interface{})["media"]
+	// 将result中的数据写入result.json
+	file, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		handlerError(err)
+	}
+	err = os.WriteFile("result.json", file, 0644)
+	if err != nil {
+		handlerError(err)
+	}
+
+	list := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["legacy"].(map[string]interface{})["entities"].(map[string]interface{})["media"]
 
 	if list == nil {
-		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
+		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
 		// ! 打印obj1的类型
+		fmt.Printf("obj1 type: %T\n", obj1)
 
 		var jsonData map[string]interface{}
 		err = json.Unmarshal([]byte(obj1.(string)), &jsonData)
