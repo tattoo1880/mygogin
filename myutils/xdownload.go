@@ -1,12 +1,12 @@
 package myutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/imroc/req/v3"
 	"log"
 	"net/http"
 	"regexp"
-	"encoding/json"
 )
 
 type GetListUtils interface {
@@ -161,7 +161,7 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 			handlerError(err)
 		}
 
-		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
+		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
 		// ! 打印obj1的类型
 		fmt.Printf("obj1 type: %T\n", obj1)
 		var jsonData map[string]interface{}
