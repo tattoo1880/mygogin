@@ -84,7 +84,7 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 		handlerError(err)
 	}
 
-	//fmt.Println("请求成功，数据为：", resp.String())
+	fmt.Println("请求成功，数据为：", resp.String())
 	//
 	//var result = map[string]interface{}{}
 	//err = resp.Unmarshal(&result)
