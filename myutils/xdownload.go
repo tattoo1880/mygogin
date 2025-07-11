@@ -87,25 +87,25 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 
 	fmt.Println("请求成功，数据为：", resp.String())
 	//
-	//var result = map[string]interface{}{}
-	//err = resp.Unmarshal(&result)
-	//if err != nil {
+	// var result = map[string]interface{}{}
+	// err = resp.Unmarshal(&result)
+	// if err != nil {
 	//	handlerError(err)
-	//}
+	// }
 	//
-	//// // 将result中的数据写入result.json
-	//// file, err := json.MarshalIndent(result, "", "  ")
-	//// if err != nil {
-	//// 	handlerError(err)
-	//// }
-	//// err = os.WriteFile("result.json", file, 0644)
-	//// if err != nil {
-	//// 	handlerError(err)
-	//// }
+	// // // 将result中的数据写入result.json
+	// // file, err := json.MarshalIndent(result, "", "  ")
+	// // if err != nil {
+	// // 	handlerError(err)
+	// // }
+	// // err = os.WriteFile("result.json", file, 0644)
+	// // if err != nil {
+	// // 	handlerError(err)
+	// // }
 	//
-	//list := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["legacy"].(map[string]interface{})["entities"].(map[string]interface{})["media"]
+	// list := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["legacy"].(map[string]interface{})["entities"].(map[string]interface{})["media"]
 	//
-	//if list == nil {
+	// if list == nil {
 	//	obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
 	//	// ! 打印obj1的类型
 	//	fmt.Printf("obj1 type: %T\n", obj1)
@@ -130,20 +130,20 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 	//
 	//	return cardlist
 	//
-	//}
+	// }
 	//
-	//op := list.([]interface{})[0].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
-	//// 取出op中的所有url
-	//resultList := []string{}
-	//for _, v := range op.([]interface{}) {
+	// op := list.([]interface{})[0].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
+	// // 取出op中的所有url
+	// resultList := []string{}
+	// for _, v := range op.([]interface{}) {
 	//	// fmt.Println(v.(map[string]interface{})["url"])
 	//	if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
 	//		resultList = append(resultList, v.(map[string]interface{})["url"].(string))
 	//	}
 	//
-	//}
+	// }
 
-	//! todo 使用正则将所有的url提取出来
+	// ! todo 使用正则将所有的url提取出来
 	var resultList []string
 	re := regexp.MustCompile(`"url"\s*:\s*"([^"]+\.mp4[^"]*)"`)
 
@@ -160,6 +160,8 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 		if err != nil {
 			handlerError(err)
 		}
+
+		log.Println("没有匹配到视频链接，尝试从其他字段获取")
 
 		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
 		// ! 打印obj1的类型
