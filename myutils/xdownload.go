@@ -1,6 +1,7 @@
 package myutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/imroc/req/v3"
 	"log"
@@ -144,14 +145,42 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 
 	//! todo 使用正则将所有的url提取出来
 	var resultList []string
-	//re := regexp.MustCompile(`"url"\s*:\s*"([^"]+\.mp4[^"]*)"`)
-	re := regexp.MustCompile(`\\?"url"\\?\s*:\s*\\?"([^"]+\.mp4[^"]*)\\?"`)
+	re := regexp.MustCompile(`"url"\s*:\s*"([^"]+\.mp4[^"]*)"`)
 
 	matches := re.FindAllStringSubmatch(resp.String(), -1)
 	for _, match := range matches {
 		if len(match) > 1 {
 			resultList = append(resultList, match[1])
 		}
+	}
+
+	if len(resultList) == 0 {
+		var result map[string]interface{}
+		err = resp.Unmarshal(&result)
+		if err != nil {
+			handlerError(err)
+		}
+
+		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
+		// ! 打印obj1的类型
+		fmt.Printf("obj1 type: %T\n", obj1)
+		var jsonData map[string]interface{}
+		err = json.Unmarshal([]byte(obj1.(string)), &jsonData)
+		if err != nil {
+			handlerError(err)
+		}
+		targetid := jsonData["component_objects"].(map[string]interface{})["media_1"].(map[string]interface{})["data"].(map[string]interface{})["id"].(string)
+		targetUrllist := jsonData["media_entities"].(map[string]interface{})[targetid].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
+		cardlist := []string{}
+		for _, v := range targetUrllist.([]interface{}) {
+			if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
+				cardlist = append(cardlist, v.(map[string]interface{})["url"].(string))
+			}
+		}
+		return cardlist
+
+		// 如果没有匹配到视频链接，尝试从其他字段获取
+
 	}
 	return resultList
 }
