@@ -144,7 +144,9 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 
 	//! todo 使用正则将所有的url提取出来
 	var resultList []string
-	re := regexp.MustCompile(`"url"\s*:\s*"([^"]+\.mp4[^"]*)"`)
+	//re := regexp.MustCompile(`"url"\s*:\s*"([^"]+\.mp4[^"]*)"`)
+	re := regexp.MustCompile(`\\?"url"\\?\s*:\s*\\?"([^"]+\.mp4[^"]*)\\?"`)
+
 	matches := re.FindAllStringSubmatch(resp.String(), -1)
 	for _, match := range matches {
 		if len(match) > 1 {
