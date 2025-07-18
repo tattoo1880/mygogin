@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"mygogin/config"
 	"mygogin/model"
@@ -11,7 +10,7 @@ import (
 // todo 导入gogin
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	config.Initlog()
 	config.Initdatabase()
 	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{}, &model.ChatMsg{})

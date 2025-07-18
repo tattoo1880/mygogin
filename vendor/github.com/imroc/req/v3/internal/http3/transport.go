@@ -10,15 +10,14 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
-	"net/url"
 	"strings"
 	"sync"
 	"sync/atomic"
 
-	"golang.org/x/net/http/httpguts"
-
 	"github.com/imroc/req/v3/internal/transport"
 	"github.com/quic-go/quic-go"
+
+	"golang.org/x/net/http/httpguts"
 )
 
 // Settings are HTTP/3 settings that apply to the underlying connection.
@@ -39,7 +38,7 @@ type RoundTripOpt struct {
 }
 
 type clientConn interface {
-	OpenRequestStream(context.Context) (*RequestStream, error)
+	OpenRequestStream(context.Context) (RequestStream, error)
 	RoundTrip(*http.Request) (*http.Response, error)
 }
 
@@ -47,7 +46,7 @@ type roundTripperWithCount struct {
 	cancel     context.CancelFunc
 	dialing    chan struct{} // closed as soon as quic.Dial(Early) returned
 	dialErr    error
-	conn       *quic.Conn
+	conn       quic.EarlyConnection
 	clientConn clientConn
 
 	useCount atomic.Int64
@@ -77,7 +76,7 @@ type Transport struct {
 	// connections for requests.
 	// If Dial is nil, a UDPConn will be created at the first request
 	// and will be reused for subsequent connections to other servers.
-	Dial func(ctx context.Context, addr string, tlsCfg *tls.Config, cfg *quic.Config) (*quic.Conn, error)
+	Dial func(ctx context.Context, addr string, tlsCfg *tls.Config, cfg *quic.Config) (quic.EarlyConnection, error)
 
 	// Enable support for HTTP/3 datagrams (RFC 9297).
 	// If a QUICConfig is set, datagram support also needs to be enabled on the QUIC layer by setting EnableDatagrams.
@@ -99,8 +98,8 @@ type Transport struct {
 	// However, if the user explicitly requested gzip it is not automatically uncompressed.
 	DisableCompression bool
 
-	StreamHijacker    func(FrameType, quic.ConnectionTracingID, *quic.Stream, error) (hijacked bool, err error)
-	UniStreamHijacker func(StreamType, quic.ConnectionTracingID, *quic.ReceiveStream, error) (hijacked bool)
+	StreamHijacker    func(FrameType, quic.ConnectionTracingID, quic.Stream, error) (hijacked bool, err error)
+	UniStreamHijacker func(StreamType, quic.ConnectionTracingID, quic.ReceiveStream, error) (hijacked bool)
 
 	Logger *slog.Logger
 
@@ -109,7 +108,7 @@ type Transport struct {
 	initOnce sync.Once
 	initErr  error
 
-	newClientConn func(*quic.Conn) clientConn
+	newClientConn func(quic.EarlyConnection) clientConn
 
 	clients   map[string]*roundTripperWithCount
 	transport *quic.Transport
@@ -120,12 +119,15 @@ var (
 	_ io.Closer         = &Transport{}
 )
 
+// Deprecated: RoundTripper was renamed to Transport.
+type RoundTripper = Transport
+
 // ErrNoCachedConn is returned when Transport.OnlyCachedConn is set
 var ErrNoCachedConn = errors.New("http3: no cached connection was available")
 
 func (t *Transport) init() error {
 	if t.newClientConn == nil {
-		t.newClientConn = func(conn *quic.Conn) clientConn {
+		t.newClientConn = func(conn quic.EarlyConnection) clientConn {
 			return newClientConn(
 				t.Options,
 				conn,
@@ -202,12 +204,9 @@ func (t *Transport) roundTripOpt(req *http.Request, opt RoundTripOpt) (*http.Res
 			}
 		}
 	}
-	return t.doRoundTripOpt(req, opt, false)
-}
 
-func (t *Transport) doRoundTripOpt(req *http.Request, opt RoundTripOpt, isRetried bool) (*http.Response, error) {
-	hostname := authorityAddr(hostnameFromURL(req.URL))
 	trace := httptrace.ContextClientTrace(req.Context())
+	hostname := authorityAddr(hostnameFromURL(req.URL))
 	traceGetConn(trace, hostname)
 	cl, isReused, err := t.getClient(req.Context(), hostname, opt.OnlyCachedConn)
 	if err != ErrNoCachedConn {
@@ -229,8 +228,8 @@ func (t *Transport) doRoundTripOpt(req *http.Request, opt RoundTripOpt, isRetrie
 		t.removeClient(hostname)
 		return nil, cl.dialErr
 	}
-	defer cl.useCount.Add(-1)
 	traceGotConn(trace, cl.conn, isReused)
+	defer cl.useCount.Add(-1)
 	rsp, err := cl.clientConn.RoundTrip(req)
 	if err != nil {
 		// request aborted due to context cancellation
@@ -239,49 +238,26 @@ func (t *Transport) doRoundTripOpt(req *http.Request, opt RoundTripOpt, isRetrie
 			return nil, err
 		default:
 		}
-		if isRetried {
-			return nil, err
-		}
 
-		t.removeClient(hostname)
-		req, err = canRetryRequest(err, req)
-		if err != nil {
+		// Retry the request on a new connection if:
+		// 1. it was sent on a reused connection,
+		// 2. this connection is now closed,
+		// 3. and the error is a timeout error.
+		select {
+		case <-cl.conn.Context().Done():
+			t.removeClient(hostname)
+			if isReused {
+				var nerr net.Error
+				if errors.As(err, &nerr) && nerr.Timeout() {
+					return t.RoundTripOpt(req, opt)
+				}
+			}
+			return nil, err
+		default:
 			return nil, err
 		}
-		return t.doRoundTripOpt(req, opt, true)
 	}
 	return rsp, nil
-}
-
-func canRetryRequest(err error, req *http.Request) (*http.Request, error) {
-	// error occurred while opening the stream, we can be sure that the request wasn't sent out
-	var connErr *errConnUnusable
-	if errors.As(err, &connErr) {
-		return req, nil
-	}
-
-	// If the request stream is reset, we can only be sure that the request wasn't processed
-	// if the error code is H3_REQUEST_REJECTED.
-	var e *Error
-	if !errors.As(err, &e) || e.ErrorCode != ErrCodeRequestRejected {
-		return nil, err
-	}
-	// if the body is nil (or http.NoBody), it's safe to reuse this request and its body
-	if req.Body == nil || req.Body == http.NoBody {
-		return req, nil
-	}
-	// if the request body can be reset back to its original state via req.GetBody, do that
-	if req.GetBody != nil {
-		newBody, err := req.GetBody()
-		if err != nil {
-			return nil, err
-		}
-		reqCopy := *req
-		reqCopy.Body = newBody
-		req = &reqCopy
-		return &reqCopy, nil
-	}
-	return nil, fmt.Errorf("http3: Transport: cannot retry err [%w] after Request.Body was written; define Request.GetBody to avoid this error", err)
 }
 
 // RoundTrip does a round trip.
@@ -352,7 +328,7 @@ func (t *Transport) getClient(ctx context.Context, hostname string, onlyCached b
 	return cl, isReused, nil
 }
 
-func (t *Transport) dial(ctx context.Context, hostname string) (*quic.Conn, clientConn, error) {
+func (t *Transport) dial(ctx context.Context, hostname string) (quic.EarlyConnection, clientConn, error) {
 	var tlsConf *tls.Config
 	if t.TLSClientConfig == nil {
 		tlsConf = &tls.Config{}
@@ -379,7 +355,7 @@ func (t *Transport) dial(ctx context.Context, hostname string) (*quic.Conn, clie
 			}
 			t.transport = &quic.Transport{Conn: udpConn}
 		}
-		dial = func(ctx context.Context, addr string, tlsCfg *tls.Config, cfg *quic.Config) (*quic.Conn, error) {
+		dial = func(ctx context.Context, addr string, tlsCfg *tls.Config, cfg *quic.Config) (quic.EarlyConnection, error) {
 			network := "udp"
 			udpAddr, err := t.resolveUDPAddr(ctx, network, addr)
 			if err != nil {
@@ -439,7 +415,7 @@ func (t *Transport) removeClient(hostname string) {
 //
 // Obtaining a ClientConn is only needed for more advanced use cases, such as
 // using Extended CONNECT for WebTransport or the various MASQUE protocols.
-func (t *Transport) NewClientConn(conn *quic.Conn) *ClientConn {
+func (t *Transport) NewClientConn(conn quic.Connection) *ClientConn {
 	return newClientConn(
 		t.Options,
 		conn,
@@ -473,13 +449,6 @@ func (t *Transport) Close() error {
 		t.transport = nil
 	}
 	return nil
-}
-
-func hostnameFromURL(url *url.URL) string {
-	if url != nil {
-		return url.Host
-	}
-	return ""
 }
 
 func validMethod(method string) bool {

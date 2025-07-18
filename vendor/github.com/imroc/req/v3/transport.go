@@ -451,7 +451,7 @@ func (t *Transport) SetTLSClientConfig(cfg *tls.Config) *Transport {
 }
 
 // SetDebug set the optional debug function.
-func (t *Transport) SetDebug(debugf func(format string, v ...any)) *Transport {
+func (t *Transport) SetDebug(debugf func(format string, v ...interface{})) *Transport {
 	t.Debugf = debugf
 	return t
 }
@@ -3519,8 +3519,8 @@ func (pc *persistConn) roundTrip(req *transportRequest) (resp *http.Response, er
 // a t.Logf func. See export_test.go's Request.WithT method.
 type tLogKey struct{}
 
-func (tr *transportRequest) logf(format string, args ...any) {
-	if logf, ok := tr.Request.Context().Value(tLogKey{}).(func(string, ...any)); ok {
+func (tr *transportRequest) logf(format string, args ...interface{}) {
+	if logf, ok := tr.Request.Context().Value(tLogKey{}).(func(string, ...interface{})); ok {
 		logf(time.Now().Format(time.RFC3339Nano)+": "+format, args...)
 	}
 }

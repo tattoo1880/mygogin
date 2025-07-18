@@ -34,16 +34,12 @@ const (
 	connectionCloseFrameType    = 0x1c
 	applicationCloseFrameType   = 0x1d
 	handshakeDoneFrameType      = 0x1e
-	resetStreamAtFrameType      = 0x24 // https://datatracker.ietf.org/doc/draft-ietf-quic-reliable-stream-reset/06/
 )
-
-var errUnknownFrameType = errors.New("unknown frame type")
 
 // The FrameParser parses QUIC frames, one by one.
 type FrameParser struct {
-	ackDelayExponent      uint8
-	supportsDatagrams     bool
-	supportsResetStreamAt bool
+	ackDelayExponent  uint8
+	supportsDatagrams bool
 
 	// To avoid allocating when parsing, keep a single ACK frame struct.
 	// It is used over and over again.
@@ -51,11 +47,10 @@ type FrameParser struct {
 }
 
 // NewFrameParser creates a new frame parser.
-func NewFrameParser(supportsDatagrams, supportsResetStreamAt bool) *FrameParser {
+func NewFrameParser(supportsDatagrams bool) *FrameParser {
 	return &FrameParser{
-		supportsDatagrams:     supportsDatagrams,
-		supportsResetStreamAt: supportsResetStreamAt,
-		ackFrame:              &AckFrame{},
+		supportsDatagrams: supportsDatagrams,
+		ackFrame:          &AckFrame{},
 	}
 }
 
@@ -115,7 +110,7 @@ func (p *FrameParser) parseFrame(b []byte, typ uint64, encLevel protocol.Encrypt
 			l, err = parseAckFrame(p.ackFrame, b, typ, ackDelayExponent, v)
 			frame = p.ackFrame
 		case resetStreamFrameType:
-			frame, l, err = parseResetStreamFrame(b, false, v)
+			frame, l, err = parseResetStreamFrame(b, v)
 		case stopSendingFrameType:
 			frame, l, err = parseStopSendingFrame(b, v)
 		case cryptoFrameType:
@@ -147,17 +142,13 @@ func (p *FrameParser) parseFrame(b []byte, typ uint64, encLevel protocol.Encrypt
 		case handshakeDoneFrameType:
 			frame = &HandshakeDoneFrame{}
 		case 0x30, 0x31:
-			if !p.supportsDatagrams {
-				return nil, 0, errUnknownFrameType
+			if p.supportsDatagrams {
+				frame, l, err = parseDatagramFrame(b, typ, v)
+				break
 			}
-			frame, l, err = parseDatagramFrame(b, typ, v)
-		case resetStreamAtFrameType:
-			if !p.supportsResetStreamAt {
-				return nil, 0, errUnknownFrameType
-			}
-			frame, l, err = parseResetStreamFrame(b, true, v)
+			fallthrough
 		default:
-			err = errUnknownFrameType
+			err = errors.New("unknown frame type")
 		}
 	}
 	if err != nil {

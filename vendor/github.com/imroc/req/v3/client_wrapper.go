@@ -29,13 +29,13 @@ func WrapRoundTripFunc(funcs ...RoundTripWrapperFunc) *Client {
 // to the default client's Client.SetCommonErrorResult.
 //
 // Deprecated: Use SetCommonErrorResult instead.
-func SetCommonError(err any) *Client {
+func SetCommonError(err interface{}) *Client {
 	return defaultClient.SetCommonErrorResult(err)
 }
 
 // SetCommonErrorResult is a global wrapper methods which delegated
 // to the default client's Client.SetCommonError.
-func SetCommonErrorResult(err any) *Client {
+func SetCommonErrorResult(err interface{}) *Client {
 	return defaultClient.SetCommonErrorResult(err)
 }
 
@@ -575,25 +575,25 @@ func ClearCookies() *Client {
 
 // SetJsonMarshal is a global wrapper methods which delegated
 // to the default client's Client.SetJsonMarshal.
-func SetJsonMarshal(fn func(v any) ([]byte, error)) *Client {
+func SetJsonMarshal(fn func(v interface{}) ([]byte, error)) *Client {
 	return defaultClient.SetJsonMarshal(fn)
 }
 
 // SetJsonUnmarshal is a global wrapper methods which delegated
 // to the default client's Client.SetJsonUnmarshal.
-func SetJsonUnmarshal(fn func(data []byte, v any) error) *Client {
+func SetJsonUnmarshal(fn func(data []byte, v interface{}) error) *Client {
 	return defaultClient.SetJsonUnmarshal(fn)
 }
 
 // SetXmlMarshal is a global wrapper methods which delegated
 // to the default client's Client.SetXmlMarshal.
-func SetXmlMarshal(fn func(v any) ([]byte, error)) *Client {
+func SetXmlMarshal(fn func(v interface{}) ([]byte, error)) *Client {
 	return defaultClient.SetXmlMarshal(fn)
 }
 
 // SetXmlUnmarshal is a global wrapper methods which delegated
 // to the default client's Client.SetXmlUnmarshal.
-func SetXmlUnmarshal(fn func(data []byte, v any) error) *Client {
+func SetXmlUnmarshal(fn func(data []byte, v interface{}) error) *Client {
 	return defaultClient.SetXmlUnmarshal(fn)
 }
 

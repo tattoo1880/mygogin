@@ -22,8 +22,8 @@ type Response struct {
 	Request    *Request
 	body       []byte
 	receivedAt time.Time
-	error      any
-	result     any
+	error      interface{}
+	result     interface{}
 }
 
 // IsSuccess method returns true if no error occurs and HTTP status `code >= 200 and <= 299`
@@ -95,14 +95,14 @@ func (r *Response) ResultState() ResultState {
 // Otherwise, return nil.
 //
 // Deprecated: Use SuccessResult instead.
-func (r *Response) Result() any {
+func (r *Response) Result() interface{} {
 	return r.SuccessResult()
 }
 
 // SuccessResult returns the automatically unmarshalled object if Request.SetSuccessResult
 // is called and ResultState returns SuccessState.
 // Otherwise, return nil.
-func (r *Response) SuccessResult() any {
+func (r *Response) SuccessResult() interface{} {
 	return r.result
 }
 
@@ -111,14 +111,14 @@ func (r *Response) SuccessResult() any {
 // Otherwise, return nil.
 //
 // Deprecated: Use ErrorResult instead.
-func (r *Response) Error() any {
+func (r *Response) Error() interface{} {
 	return r.error
 }
 
 // ErrorResult returns the automatically unmarshalled object when Request.SetErrorResult
 // or Client.SetCommonErrorResult is called, and ResultState returns ErrorState.
 // Otherwise, return nil.
-func (r *Response) ErrorResult() any {
+func (r *Response) ErrorResult() interface{} {
 	return r.error
 }
 
@@ -151,7 +151,7 @@ func (r *Response) setReceivedAt() {
 }
 
 // UnmarshalJson unmarshalls JSON response body into the specified object.
-func (r *Response) UnmarshalJson(v any) error {
+func (r *Response) UnmarshalJson(v interface{}) error {
 	if r.Err != nil {
 		return r.Err
 	}
@@ -163,7 +163,7 @@ func (r *Response) UnmarshalJson(v any) error {
 }
 
 // UnmarshalXml unmarshalls XML response body into the specified object.
-func (r *Response) UnmarshalXml(v any) error {
+func (r *Response) UnmarshalXml(v interface{}) error {
 	if r.Err != nil {
 		return r.Err
 	}
@@ -176,7 +176,7 @@ func (r *Response) UnmarshalXml(v any) error {
 
 // Unmarshal unmarshalls response body into the specified object according
 // to response `Content-Type`.
-func (r *Response) Unmarshal(v any) error {
+func (r *Response) Unmarshal(v interface{}) error {
 	if r.Err != nil {
 		return r.Err
 	}
@@ -192,7 +192,7 @@ func (r *Response) Unmarshal(v any) error {
 
 // Into unmarshalls response body into the specified object according
 // to response `Content-Type`.
-func (r *Response) Into(v any) error {
+func (r *Response) Into(v interface{}) error {
 	return r.Unmarshal(v)
 }
 

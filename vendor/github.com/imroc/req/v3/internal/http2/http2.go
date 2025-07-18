@@ -96,7 +96,7 @@ func httpCodeString(code int) string {
 const bufWriterPoolBufferSize = 4 << 10
 
 var bufWriterPool = sync.Pool{
-	New: func() any {
+	New: func() interface{} {
 		return bufio.NewWriterSize(nil, bufWriterPoolBufferSize)
 	},
 }
@@ -140,7 +140,7 @@ type connectionStater interface {
 	ConnectionState() tls.ConnectionState
 }
 
-var sorterPool = sync.Pool{New: func() any { return new(sorter) }}
+var sorterPool = sync.Pool{New: func() interface{} { return new(sorter) }}
 
 type sorter struct {
 	v []string // owned by sorter
