@@ -30,7 +30,7 @@ func main() {
 
 	// 初始化路由
 	r := myrouter.Initrouter()
-	err1 := r.Run("127.0.0.1:8080")
+	err1 := r.Run("127.0.0.1:8090")
 	if err1 != nil {
 
 		config.Logger.Fatal("路由启动失败", zap.Error(err1))
