@@ -44,7 +44,7 @@ func Initrouter() *gin.Engine {
 	r.Static("/static", "./static")
 	r.Static("/assets", "./static/assets") // Matches /assets
 
-	api := r.Group("/api")
+	api := r.Group("/mygogin/api")
 	users := api.Group("/users")
 	// users 子路由
 	{
