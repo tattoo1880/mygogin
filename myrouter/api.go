@@ -41,8 +41,8 @@ func Initrouter() *gin.Engine {
 	r.Use(cors.Default())
 
 	r.StaticFile("/mygogin/", "./static/index.html") // Matches /
-	r.Static("/static", "./static")
-	r.Static("/assets", "./static/assets") // Matches /assets
+	r.Static("/static", "./mygogin/static")
+	r.Static("/assets", "./mygogin/static/assets") // Matches /assets
 
 	api := r.Group("/mygogin/api")
 	users := api.Group("/users")
