@@ -1,12 +1,13 @@
 package myutils
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/imroc/req/v3"
 	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/imroc/req/v3"
+	"github.com/tidwall/gjson"
 )
 
 type GetListUtils interface {
@@ -86,62 +87,6 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 	}
 
 	fmt.Println("请求成功，数据为：", resp.String())
-	//
-	// var result = map[string]interface{}{}
-	// err = resp.Unmarshal(&result)
-	// if err != nil {
-	//	handlerError(err)
-	// }
-	//
-	// // // 将result中的数据写入result.json
-	// // file, err := json.MarshalIndent(result, "", "  ")
-	// // if err != nil {
-	// // 	handlerError(err)
-	// // }
-	// // err = os.WriteFile("result.json", file, 0644)
-	// // if err != nil {
-	// // 	handlerError(err)
-	// // }
-	//
-	// list := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["legacy"].(map[string]interface{})["entities"].(map[string]interface{})["media"]
-	//
-	// if list == nil {
-	//	obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[1].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
-	//	// ! 打印obj1的类型
-	//	fmt.Printf("obj1 type: %T\n", obj1)
-	//
-	//	var jsonData map[string]interface{}
-	//	err = json.Unmarshal([]byte(obj1.(string)), &jsonData)
-	//
-	//	if err != nil {
-	//		handlerError(err)
-	//	}
-	//
-	//	targetid := jsonData["component_objects"].(map[string]interface{})["media_1"].(map[string]interface{})["data"].(map[string]interface{})["id"].(string)
-	//
-	//	targetUrllist := jsonData["media_entities"].(map[string]interface{})[targetid].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
-	//
-	//	cardlist := []string{}
-	//	for _, v := range targetUrllist.([]interface{}) {
-	//		if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
-	//			cardlist = append(cardlist, v.(map[string]interface{})["url"].(string))
-	//		}
-	//	}
-	//
-	//	return cardlist
-	//
-	// }
-	//
-	// op := list.([]interface{})[0].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
-	// // 取出op中的所有url
-	// resultList := []string{}
-	// for _, v := range op.([]interface{}) {
-	//	// fmt.Println(v.(map[string]interface{})["url"])
-	//	if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
-	//		resultList = append(resultList, v.(map[string]interface{})["url"].(string))
-	//	}
-	//
-	// }
 
 	// ! todo 使用正则将所有的url提取出来
 	var resultList []string
@@ -155,34 +100,83 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 	}
 
 	if len(resultList) == 0 {
-		var result map[string]interface{}
-		err = resp.Unmarshal(&result)
-		if err != nil {
-			handlerError(err)
-		}
-
-		log.Println("没有匹配到视频链接，尝试从其他字段获取")
-
-		obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
-		// ! 打印obj1的类型
-		fmt.Printf("obj1 type: %T\n", obj1)
-		var jsonData map[string]interface{}
-		err = json.Unmarshal([]byte(obj1.(string)), &jsonData)
-		if err != nil {
-			handlerError(err)
-		}
-		targetid := jsonData["component_objects"].(map[string]interface{})["media_1"].(map[string]interface{})["data"].(map[string]interface{})["id"].(string)
-		targetUrllist := jsonData["media_entities"].(map[string]interface{})[targetid].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
-		cardlist := []string{}
-		for _, v := range targetUrllist.([]interface{}) {
-			if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
-				cardlist = append(cardlist, v.(map[string]interface{})["url"].(string))
-			}
-		}
-		return cardlist
+		// var result map[string]interface{}
+		// err = resp.Unmarshal(&result)
+		// if err != nil {
+		// 	handlerError(err)
+		// }
+		//
+		// log.Println("没有匹配到视频链接，尝试从其他字段获取")
+		//
+		// obj1 := result["data"].(map[string]interface{})["threaded_conversation_with_injections_v2"].(map[string]interface{})["instructions"].([]interface{})[0].(map[string]interface{})["entries"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})["itemContent"].(map[string]interface{})["tweet_results"].(map[string]interface{})["result"].(map[string]interface{})["card"].(map[string]interface{})["legacy"].(map[string]interface{})["binding_values"].([]interface{})[0].(map[string]interface{})["value"].(map[string]interface{})["string_value"]
+		// // ! 打印obj1的类型
+		// fmt.Printf("obj1 type: %T\n", obj1)
+		// var jsonData map[string]interface{}
+		// err = json.Unmarshal([]byte(obj1.(string)), &jsonData)
+		// if err != nil {
+		// 	handlerError(err)
+		// }
+		// targetid := jsonData["component_objects"].(map[string]interface{})["media_1"].(map[string]interface{})["data"].(map[string]interface{})["id"].(string)
+		// targetUrllist := jsonData["media_entities"].(map[string]interface{})[targetid].(map[string]interface{})["video_info"].(map[string]interface{})["variants"]
+		// cardlist := []string{}
+		// for _, v := range targetUrllist.([]interface{}) {
+		// 	if v.(map[string]interface{})["content_type"].(string) == "video/mp4" {
+		// 		cardlist = append(cardlist, v.(map[string]interface{})["url"].(string))
+		// 	}
+		// }
+		// return cardlist
 
 		// 如果没有匹配到视频链接，尝试从其他字段获取
 
+		var results []gjson.Result
+		jsonData := resp.String()
+		result := gjson.Parse(jsonData)
+		findAllByKey(result, "string_value", &results)
+		if len(results) == 0 {
+			log.Println("没有匹配到视频链接")
+			return resultList
+		}
+		fmt.Println("找到了string_value字段，数量为：", len(results))
+		for _, res := range results {
+			var innerResults []gjson.Result
+			innerResult := gjson.Parse(res.String())
+			findAllByKey(innerResult, "url", &innerResults)
+			for _, innerRes := range innerResults {
+				if matched, _ := regexp.MatchString(`\.mp4`, innerRes.String()); matched {
+					resultList = append(resultList, innerRes.String())
+				}
+			}
+			fmt.Println("当前string_value字段中找到的url数量为：", len(innerResults))
+			fmt.Println(innerResults)
+			if len(innerResults) != 0 {
+				// ! 将结果返回
+				for _, innerRes := range innerResults {
+					if matched, _ := regexp.MatchString(`\.mp4`, innerRes.String()); matched {
+						resultList = append(resultList, innerRes.String())
+					}
+				}
+				break
+			}
+			return resultList
+		}
+
 	}
 	return resultList
+}
+
+func findAllByKey(result gjson.Result, key string, out *[]gjson.Result) {
+	if result.IsObject() {
+		result.ForEach(func(k, v gjson.Result) bool {
+			if k.String() == key {
+				*out = append(*out, v)
+			}
+			findAllByKey(v, key, out)
+			return true
+		})
+	} else if result.IsArray() {
+		result.ForEach(func(_, v gjson.Result) bool {
+			findAllByKey(v, key, out)
+			return true
+		})
+	}
 }
