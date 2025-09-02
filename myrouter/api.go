@@ -38,6 +38,7 @@ func Initrouter() *gin.Engine {
 	websocketservice := service.NewWebSocketService(rabbitservice)
 
 	r := gin.Default()
+	r.RemoveExtraSlash = true
 	// CORS配置
 	r.Use(cors.Default())
 
