@@ -1,13 +1,14 @@
 package myrouter
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"mygogin/config"
 	"mygogin/controller"
 	"mygogin/model"
 	"mygogin/myutils"
 	"mygogin/service"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func Initrouter() *gin.Engine {
@@ -73,7 +74,7 @@ func Initrouter() *gin.Engine {
 	// Utils相关的路由
 	myutilsroute := api.Group("/utils")
 	{
-		myutilsroute.GET("/:id", xlistController.GetList)
+		myutilsroute.GET("/", xlistController.GetList)
 		myutilsroute.POST("/xvideo", xvideoController.GetXVideoUrl)
 
 	}

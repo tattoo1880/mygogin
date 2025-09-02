@@ -5,13 +5,14 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com/imroc/req/v3"
 	"github.com/tidwall/gjson"
 )
 
 type GetListUtils interface {
-	GetList(id string) []string
+	GetList(id string) string
 }
 
 type getListUtilsImpl struct{}
@@ -26,7 +27,7 @@ func handlerError(err error) {
 	}
 }
 
-func (g *getListUtilsImpl) GetList(id string) []string {
+func (g *getListUtilsImpl) GetList(id string) string {
 	client := req.C()
 	request := client.R()
 
@@ -134,7 +135,7 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 		findAllByKey(result, "string_value", &results)
 		if len(results) == 0 {
 			log.Println("没有匹配到视频链接")
-			return resultList
+			return ""
 		}
 		fmt.Println("找到了string_value字段，数量为：", len(results))
 		for _, res := range results {
@@ -157,11 +158,12 @@ func (g *getListUtilsImpl) GetList(id string) []string {
 				}
 				break
 			}
-			return resultList
 		}
 
 	}
-	return resultList
+
+	bestUrl := getBestQualityURL(resultList)
+	return bestUrl
 }
 
 func findAllByKey(result gjson.Result, key string, out *[]gjson.Result) {
@@ -179,4 +181,23 @@ func findAllByKey(result gjson.Result, key string, out *[]gjson.Result) {
 			return true
 		})
 	}
+}
+
+func getBestQualityURL(urls []string) string {
+	re := regexp.MustCompile(`(\d{2,4})x(\d{2,4})`)
+	maxPixels := 0
+	bestURL := ""
+	for _, url := range urls {
+		match := re.FindStringSubmatch(url)
+		if len(match) == 3 {
+			w, _ := strconv.Atoi(match[1])
+			h, _ := strconv.Atoi(match[2])
+			pixels := w * h
+			if pixels > maxPixels {
+				maxPixels = pixels
+				bestURL = url
+			}
+		}
+	}
+	return bestURL
 }

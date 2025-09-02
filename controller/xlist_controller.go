@@ -1,8 +1,11 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"mygogin/service"
+	"regexp"
+
+	"github.com/gin-gonic/gin"
 )
 
 type XListController struct {
@@ -14,17 +17,32 @@ func NewXListController(service service.XListService) *XListController {
 }
 
 func (c *XListController) GetList(ctx *gin.Context) {
-	id := ctx.Param("id")
+	url := ctx.Query("url")
+	re := regexp.MustCompile(`(\d{10,})$`)
+
+	var id string
+
+	match := re.FindStringSubmatch(url)
+	if len(match) > 1 {
+
+		id = match[1]
+
+	} else {
+		id = ""
+	}
+
+	fmt.Println("url:", id)
 	if id == "" {
 		ctx.JSON(400, gin.H{"error": "ID is required"})
 		return
 	}
 
 	list := c.service.GetList(id)
-	if list == nil {
+	if list == "" {
 		ctx.JSON(404, gin.H{"error": "List not found"})
 		return
 	}
 
-	ctx.JSON(200, gin.H{"list": list})
+	//ctx.JSON(200, gin.H{"url": list})
+	ctx.Redirect(302, list)
 }
