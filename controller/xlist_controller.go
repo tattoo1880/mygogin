@@ -18,7 +18,7 @@ func NewXListController(service service.XListService) *XListController {
 
 func (c *XListController) GetList(ctx *gin.Context) {
 	url := ctx.Query("url")
-	re := regexp.MustCompile(`(\d{10,})$`)
+	re := regexp.MustCompile(`/(\d{10,})`)
 
 	var id string
 
