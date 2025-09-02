@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"mygogin/model"
 	"mygogin/service"
 	"regexp"
 
@@ -9,11 +10,15 @@ import (
 )
 
 type XListController struct {
-	service service.XListService
+	service           service.XListService
+	downloaddbservice service.DownloadServiceInterface
 }
 
-func NewXListController(service service.XListService) *XListController {
-	return &XListController{service: service}
+func NewXListController(service service.XListService, downloadservice service.DownloadServiceInterface) *XListController {
+	return &XListController{
+		service:           service,
+		downloaddbservice: downloadservice,
+	}
 }
 
 func (c *XListController) GetList(ctx *gin.Context) {
@@ -41,6 +46,15 @@ func (c *XListController) GetList(ctx *gin.Context) {
 	if list == "" {
 		ctx.JSON(404, gin.H{"error": "List not found"})
 		return
+	}
+
+	var donwload = &model.DonwLoad{
+		DonwLoadUrl: list,
+	}
+
+	err := c.downloaddbservice.CreateDonwLoad(donwload)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": err})
 	}
 
 	//ctx.JSON(200, gin.H{"url": list})

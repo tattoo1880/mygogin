@@ -24,7 +24,10 @@ func Initrouter() *gin.Engine {
 
 	myutilsimpl := myutils.NewGetListUtils()
 	myutilservice := service.NewXListService(myutilsimpl)
-	xlistController := controller.NewXListController(myutilservice)
+	donwlaodrepo := model.NewDonwLoadRepo(config.MySqlDB)
+	downloadservice := service.NewDownloadService(donwlaodrepo)
+
+	xlistController := controller.NewXListController(myutilservice, downloadservice)
 
 	myutilsximpl := myutils.NewXVideoDownload()
 	myxvideoservice := service.NewXVideoService(myutilsximpl)

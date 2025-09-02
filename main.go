@@ -1,10 +1,11 @@
 package main
 
 import (
-	"go.uber.org/zap"
 	"mygogin/config"
 	"mygogin/model"
 	"mygogin/myrouter"
+
+	"go.uber.org/zap"
 )
 
 // todo 导入gogin
@@ -13,7 +14,7 @@ func main() {
 	//gin.SetMode(gin.ReleaseMode)
 	config.Initlog()
 	config.Initdatabase()
-	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{}, &model.ChatMsg{})
+	err := config.MySqlDB.AutoMigrate(&model.User{}, &model.Event{}, &model.ChatMsg{}, &model.DonwLoad{})
 
 	if err != nil {
 		config.Logger.Fatal("迁移数据库失败", zap.Error(err))
