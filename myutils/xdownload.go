@@ -47,8 +47,8 @@ func (g *getListUtilsImpl) GetList(id string) string {
 		"sec-fetch-mode":            "cors",
 		"sec-fetch-site":            "same-origin",
 		"user-agent":                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-		"x-client-transaction-id":   "neq8NAn0WD0jNMClKOp1AoqDRBEMmocz5y4CH2x97E6PdtASQu/sQJ4W0PQO8M+VXodlYJ7KSRAd+4Zi+REYzzWlg+rjng",
-		"x-csrf-token":              "4ae004fe95a13ee8cc45769bfc42f777ff3731f9b7de80d3af0b469cc2ac47eed91f84d7d10a2b875e12b8066d7142b5c0fd794311f1c34f98388cbfe16462e1fb661f761e2cd1f15afddd3a8112d2fe",
+		"x-client-transaction-id":   "g0u4vt+Ko5s391U5LENI0nRzSYAEBA0FshF7ipCTFWfM6TyLegvRo0sSKwNT5QA6TNIXuIbmM0K0tipwpOhaVXyUGBN5gA",
+		"x-csrf-token":              "9d2cd6b8f29f24503bcf8a0677a02a46d61d4f6c34e522268d5764bfdb3f38d79f69b24c8637f1e3f7909b0b093842e8d3c57eedfab08ccff586f0e991145fbd3698395aa576180ce81b6cd5063c41e3",
 		"x-twitter-active-user":     "yes",
 		"x-twitter-auth-type":       "OAuth2Session",
 		"x-twitter-client-language": "zh-cn",
@@ -57,15 +57,15 @@ func (g *getListUtilsImpl) GetList(id string) string {
 
 	// 设置Cookies
 	cookies := []*http.Cookie{
-		{Name: "guest_id", Value: "v1%3A174990001013364461"},
+		{Name: "guest_id", Value: "v1%3A177071483672131597"},
 		{Name: "guest_id_ads", Value: "v1%3A174990001013364461"},
 		{Name: "guest_id_marketing", Value: "v1%3A174990001013364461"},
 		{Name: "__cf_bm", Value: "1uek3OYTtepgGLcUMBaLHl62ncNu6pBMPPN8vFpAJWQ-1749900010-1.0.1.1-0g4_5xyhLEzXxMIVj9PN0oygPfaydhwkhA7IicacfC2dQeUSNkpnruU.kbZ9IlxrUf0pWSXbLSfZkCAkHfs4GKloQ0EHVUXiANndlbDJqk8"},
 		{Name: "personalization_id", Value: "v1_H6K4LwMccNB+x5dN/aXIXg=="},
 		{Name: "gt", Value: "1933846922655334517"},
 		{Name: "kdt", Value: "c3CfYlYOf9Q7Wnm5WLWNCimzFE7W31KemKWBHtlJ"},
-		{Name: "auth_token", Value: "903daf0b5421b5d1932777277976e84f7282aaa5"},
-		{Name: "ct0", Value: "4ae004fe95a13ee8cc45769bfc42f777ff3731f9b7de80d3af0b469cc2ac47eed91f84d7d10a2b875e12b8066d7142b5c0fd794311f1c34f98388cbfe16462e1fb661f761e2cd1f15afddd3a8112d2fe"},
+		{Name: "auth_token", Value: "c6d4545e0a6e5bf0455f92eb29f03a87b6c40eaf"},
+		{Name: "ct0", Value: "9d2cd6b8f29f24503bcf8a0677a02a46d61d4f6c34e522268d5764bfdb3f38d79f69b24c8637f1e3f7909b0b093842e8d3c57eedfab08ccff586f0e991145fbd3698395aa576180ce81b6cd5063c41e3"},
 		{Name: "att", Value: "1-yDmgHZVUZCcDKf4gGI7b9RLWQBtkYPxNzzrp3Gdj"},
 		{Name: "lang", Value: "en"},
 		{Name: "twid", Value: "u%3D1850829389724033024"},
@@ -163,6 +163,13 @@ func (g *getListUtilsImpl) GetList(id string) string {
 	}
 
 	bestUrl := getBestQualityURL(resultList)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
+	fmt.Println(bestUrl)
 	return bestUrl
 }
 
