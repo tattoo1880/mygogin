@@ -31,6 +31,28 @@ func (g *getListUtilsImpl) GetList(id string) string {
 	client := req.C()
 	request := client.R()
 
+	//header
+	//headers = {
+	//	'accept': '*/*',
+	//		'accept-language': 'en-US,en;q=0.9,en-GB;q=0.8,zh-CN;q=0.7,zh;q=0.6',
+	//		'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
+	//		'content-type': 'application/json',
+	//		'priority': 'u=1, i',
+	//		'referer': 'https://x.com/gcjpzx123/status/2029552095544901809',
+	//		'sec-ch-ua': '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
+	//		'sec-ch-ua-mobile': '?0',
+	//		'sec-ch-ua-platform': '"macOS"',
+	//		'sec-fetch-dest': 'empty',
+	//		'sec-fetch-mode': 'cors',
+	//		'sec-fetch-site': 'same-origin',
+	//		'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+	//		'x-client-transaction-id': 'l2pt0KOfnkaN2s1ZjigfJVVnc0AK7rTubwX2dK5QBXMQyUn4Nw+6qPmMou1m5j6dm2kRyJJy8G//CdK9mRdKvF0O7LzylA',
+	//		'x-csrf-token': 'bb67e64f4675e7592885bbacac6e7cbaaf8ce6155ba4f7683d2d0e7a5581877768ff150ba8fd4c6ff9550cf55d9b20ec4290be531a397980b20b066f000cb6b3b32309c8a53bbe50806604ab05ac8d7a',
+	//		'x-twitter-active-user': 'yes',
+	//		'x-twitter-auth-type': 'OAuth2Session',
+	//		'x-twitter-client-language': 'zh-cn',
+	//	# 'cookie': 'guest_id_marketing=v1%3A177306589292335312; guest_id_ads=v1%3A177306589292335312; guest_id=v1%3A177306589292335312; personalization_id="v1_ZhYTF4+MKum/bZbBRWtX5A=="; gt=2031011677500834269; __cuid=de3cc0d2817746b0a8e21cb49fc6ab23; g_state={"i_l":0,"i_ll":1773065906025,"i_b":"Zislfis2CC4+7INXL1IUHBOrofYRv0+Rjarssp+mC9I","i_e":{"enable_itp_optimization":0}}; kdt=44Nsxf6CQrk1YEIzsn8KGADuBe95GzFvKWFrNwr1; auth_token=b8528b5c097786837ef3958cfcbf3255101feb02; ct0=bb67e64f4675e7592885bbacac6e7cbaaf8ce6155ba4f7683d2d0e7a5581877768ff150ba8fd4c6ff9550cf55d9b20ec4290be531a397980b20b066f000cb6b3b32309c8a53bbe50806604ab05ac8d7a; att=1-y3LCfr4c6UEAtz1bucHTcEkpFgorQDUs249gMDhm; twid=u%3D1850829389724033024; __cf_bm=3hFRqD4PSTcpWmzHAXmO0jcbC.0PDGd8C2it8IAd0ZU-1773070861.7285812-1.0.1.1-1jz.G7U1FwcBZRLplmagqO0CYx2IMlT93AmfC0.enQPqUAb3yMQbZfYe1uo7TScdzifm1Mf0HnjV4NlO1Ojd9b6yGOvkGIx30rgTG6ezMojG5U7.2CnrQk_t5sw5rDli; lang=zh-CN',
+	//}
 	// 设置请求头
 
 	request.SetHeaders(map[string]string{
@@ -47,27 +69,25 @@ func (g *getListUtilsImpl) GetList(id string) string {
 		"sec-fetch-mode":            "cors",
 		"sec-fetch-site":            "same-origin",
 		"user-agent":                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-		"x-client-transaction-id":   "g0u4vt+Ko5s391U5LENI0nRzSYAEBA0FshF7ipCTFWfM6TyLegvRo0sSKwNT5QA6TNIXuIbmM0K0tipwpOhaVXyUGBN5gA",
-		"x-csrf-token":              "9d2cd6b8f29f24503bcf8a0677a02a46d61d4f6c34e522268d5764bfdb3f38d79f69b24c8637f1e3f7909b0b093842e8d3c57eedfab08ccff586f0e991145fbd3698395aa576180ce81b6cd5063c41e3",
+		"x-client-transaction-id":   "l2pt0KOfnkaN2s1ZjigfJVVnc0AK7rTubwX2dK5QBXMQyUn4Nw+6qPmMou1m5j6dm2kRyJJy8G//CdK9mRdKvF0O7LzylA",
+		"x-csrf-token":              "bb67e64f4675e7592885bbacac6e7cbaaf8ce6155ba4f7683d2d0e7a5581877768ff150ba8fd4c6ff9550cf55d9b20ec4290be531a397980b20b066f000cb6b3b32309c8a53bbe50806604ab05ac8d7a",
 		"x-twitter-active-user":     "yes",
 		"x-twitter-auth-type":       "OAuth2Session",
 		"x-twitter-client-language": "zh-cn",
-		"x-xp-forwarded-for":        "ff261f1be977c77bf684384b042e08be8dd2289e34dd88c7ca2d55f2d67581c406580ff0e4c22fad8e254d17238830fa0fb7f24fa78523f35e338d0a994df9419cf36a468f37b48463a985ed83f6425077f62d14fd80a3c6fb643e6cacf7da08d97d2bc8d9f62ce7ef8f6e9276042e766926acaee1525d8182fc73af1560cd0787522279fcc165fde3a46ff61a09ea8d957c9a60fc677b40fbff13abb4dda6b4afb5fec0cf017d87aa91686f01b910bc7581f664dccfd878781317834b81c12ef896772a4e4210c2e477ccebdf99ddcc52759fb10d69ae0e53ac5bc02df243c4654136e0bb98f34d5911c05357a3ce8c4f89bb8b1d8d02a770b9521f87925ac9c2",
 	})
 
-	// 设置Cookies
 	cookies := []*http.Cookie{
-		{Name: "guest_id", Value: "v1%3A177071483672131597"},
-		{Name: "guest_id_ads", Value: "v1%3A174990001013364461"},
-		{Name: "guest_id_marketing", Value: "v1%3A174990001013364461"},
-		{Name: "__cf_bm", Value: "1uek3OYTtepgGLcUMBaLHl62ncNu6pBMPPN8vFpAJWQ-1749900010-1.0.1.1-0g4_5xyhLEzXxMIVj9PN0oygPfaydhwkhA7IicacfC2dQeUSNkpnruU.kbZ9IlxrUf0pWSXbLSfZkCAkHfs4GKloQ0EHVUXiANndlbDJqk8"},
-		{Name: "personalization_id", Value: "v1_H6K4LwMccNB+x5dN/aXIXg=="},
-		{Name: "gt", Value: "1933846922655334517"},
-		{Name: "kdt", Value: "c3CfYlYOf9Q7Wnm5WLWNCimzFE7W31KemKWBHtlJ"},
-		{Name: "auth_token", Value: "c6d4545e0a6e5bf0455f92eb29f03a87b6c40eaf"},
-		{Name: "ct0", Value: "9d2cd6b8f29f24503bcf8a0677a02a46d61d4f6c34e522268d5764bfdb3f38d79f69b24c8637f1e3f7909b0b093842e8d3c57eedfab08ccff586f0e991145fbd3698395aa576180ce81b6cd5063c41e3"},
-		{Name: "att", Value: "1-yDmgHZVUZCcDKf4gGI7b9RLWQBtkYPxNzzrp3Gdj"},
-		{Name: "lang", Value: "en"},
+		{Name: "guest_id", Value: "v1%3A177306589292335312"},
+		{Name: "guest_id_ads", Value: "v1%3A177306589292335312"},
+		{Name: "guest_id_marketing", Value: "v1%3A177306589292335312"},
+		{Name: "__cf_bm", Value: "3hFRqD4PSTcpWmzHAXmO0jcbC.0PDGd8C2it8IAd0ZU-1773070861.7285812-1.0.1.1-1jz.G7U1FwcBZRLplmagqO0CYx2IMlT93AmfC0.enQPqUAb3yMQbZfYe1uo7TScdzifm1Mf0HnjV4NlO1Ojd9b6yGOvkGIx30rgTG6ezMojG5U7.2CnrQk_t5sw5rDli"},
+		{Name: "personalization_id", Value: "v1_ZhYTF4+MKum/bZbBRWtX5A=="},
+		{Name: "gt", Value: "2031011677500834269"},
+		{Name: "kdt", Value: "44Nsxf6CQrk1YEIzsn8KGADuBe95GzFvKWFrNwr1"},
+		{Name: "auth_token", Value: "b8528b5c097786837ef3958cfcbf3255101feb02"},
+		{Name: "ct0", Value: "bb67e64f4675e7592885bbacac6e7cbaaf8ce6155ba4f7683d2d0e7a5581877768ff150ba8fd4c6ff9550cf55d9b20ec4290be531a397980b20b066f000cb6b3b32309c8a53bbe50806604ab05ac8d7a"},
+		{Name: "att", Value: "1-y3LCfr4c6UEAtz1bucHTcEkpFgorQDUs249gMDhm"},
+		{Name: "lang", Value: "zh-CN"},
 		{Name: "twid", Value: "u%3D1850829389724033024"},
 	}
 
@@ -78,9 +98,10 @@ func (g *getListUtilsImpl) GetList(id string) string {
 		"features":     `{"rweb_video_screen_enabled":false,"payments_enabled":false,"profile_label_improvements_pcf_label_in_post_enabled":true,"rweb_tipjar_consumption_enabled":true,"verified_phone_label_enabled":false,"creator_subscriptions_tweet_preview_api_enabled":true,"responsive_web_graphql_timeline_navigation_enabled":true,"responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,"premium_content_api_read_enabled":false,"communities_web_enable_tweet_community_results_fetch":true,"c9s_tweet_anatomy_moderator_badge_enabled":true,"responsive_web_grok_analyze_button_fetch_trends_enabled":false,"responsive_web_grok_analyze_post_followups_enabled":true,"responsive_web_jetfuel_frame":false,"responsive_web_grok_share_attachment_enabled":true,"articles_preview_enabled":true,"responsive_web_edit_tweet_api_enabled":true,"graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,"view_counts_everywhere_api_enabled":true,"longform_notetweets_consumption_enabled":true,"responsive_web_twitter_article_tweet_consumption_enabled":true,"tweet_awards_web_tipping_enabled":false,"responsive_web_grok_show_grok_translated_post":false,"responsive_web_grok_analysis_button_from_backend":true,"creator_subscriptions_quote_tweet_preview_enabled":false,"freedom_of_speech_not_reach_fetch_enabled":true,"standardized_nudges_misinfo":true,"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,"longform_notetweets_rich_text_read_enabled":true,"longform_notetweets_inline_media_enabled":true,"responsive_web_grok_image_annotation_enabled":true,"responsive_web_enhance_cards_enabled":false}`,
 		"fieldToggles": `{"withArticleRichContentState":true,"withArticlePlainText":false,"withGrokAnalyze":false,"withDisallowedReplyControls":false}`,
 	}
-	targetUrl := "https://x.com/i/api/graphql/8IPrg-fiWPM4p735QRfGqA/TweetDetail"
+	targetUrl := "https://x.com/i/api/graphql/vsCTCQrF8oqASUb-x2SBcg/TweetDetail"
 	// 要把data，变成form表单的形式然后get出去
-	request.SetFormData(data)
+	//request.SetFormData(data)
+	request.SetQueryParams(data)
 
 	resp, err := request.Get(targetUrl)
 	if err != nil {
